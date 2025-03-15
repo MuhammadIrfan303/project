@@ -20,12 +20,13 @@ const HomePage = () => {
     <div>
       {/* Hero Section */}
       <HeroSection />
-      
+      {/* gjhdsgj */}
+
       {/* About Us Section */}
       <section id="about" className="py-16 bg-white dark:bg-gray-800">
         <div className="container-custom mx-auto">
           <div className="text-center mb-12">
-            <motion.h2 
+            <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -34,7 +35,7 @@ const HomePage = () => {
             >
               About Us
             </motion.h2>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -44,7 +45,7 @@ const HomePage = () => {
               We're dedicated to helping you find the perfect property that matches your lifestyle and preferences.
             </motion.p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -60,7 +61,7 @@ const HomePage = () => {
                 Founded in 2020, we've helped thousands of clients find properties that perfectly match their needs, preferences, and budget. Our platform combines cutting-edge technology with personalized service to create a seamless real estate experience.
               </p>
             </motion.div>
-            
+
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -68,17 +69,17 @@ const HomePage = () => {
               transition={{ duration: 0.5 }}
               className="rounded-lg overflow-hidden shadow-lg"
             >
-              <img 
-                src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2073&q=80" 
-                alt="Our office" 
+              <img
+                src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2073&q=80"
+                alt="Our office"
                 className="w-full h-80 object-cover"
               />
             </motion.div>
           </div>
-          
+
           {/* Team Section */}
           <div className="mt-16">
-            <motion.h3 
+            <motion.h3
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -87,7 +88,7 @@ const HomePage = () => {
             >
               Meet Our Team
             </motion.h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {mockTeamMembers.map((member, index) => (
                 <motion.div
@@ -98,9 +99,9 @@ const HomePage = () => {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   className="bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden shadow-md"
                 >
-                  <img 
-                    src={member.image} 
-                    alt={member.name} 
+                  <img
+                    src={member.image}
+                    alt={member.name}
                     className="w-full h-64 object-cover"
                   />
                   <div className="p-6">
@@ -114,12 +115,12 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-      
+
       {/* Services Section */}
       <section id="services" className="py-16 bg-gray-100 dark:bg-gray-900">
         <div className="container-custom mx-auto">
           <div className="text-center mb-12">
-            <motion.h2 
+            <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -128,7 +129,7 @@ const HomePage = () => {
             >
               Our Services
             </motion.h2>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -138,7 +139,7 @@ const HomePage = () => {
               We offer a comprehensive range of services to make your property journey smooth and successful.
             </motion.p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Service 1 */}
             <motion.div
@@ -156,7 +157,7 @@ const HomePage = () => {
                 Browse our extensive collection of properties for sale and rent, with detailed information and high-quality images.
               </p>
             </motion.div>
-            
+
             {/* Service 2 */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -173,7 +174,7 @@ const HomePage = () => {
                 Use our powerful search tools to filter properties by location, price, amenities, and more to find your perfect match.
               </p>
             </motion.div>
-            
+
             {/* Service 3 */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -190,7 +191,7 @@ const HomePage = () => {
                 Experience properties remotely with our immersive 360-degree virtual tours, saving you time and travel.
               </p>
             </motion.div>
-            
+
             {/* Service 4 */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -210,15 +211,15 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-      
+
       {/* Featured Properties Section */}
       <FeaturedProperties />
-      
+
       {/* Testimonials Section */}
       <section className="py-16 bg-white dark:bg-gray-800">
         <div className="container-custom mx-auto">
           <div className="text-center mb-12">
-            <motion.h2 
+            <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -227,7 +228,7 @@ const HomePage = () => {
             >
               What Our Clients Say
             </motion.h2>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -237,7 +238,7 @@ const HomePage = () => {
               Don't just take our word for it. Here's what our satisfied clients have to say about their experience with us.
             </motion.p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {mockTestimonials.map((testimonial, index) => (
               <motion.div
@@ -249,9 +250,9 @@ const HomePage = () => {
                 className="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg shadow-md"
               >
                 <div className="flex items-center mb-4">
-                  <img 
-                    src={testimonial.image} 
-                    alt={testimonial.name} 
+                  <img
+                    src={testimonial.image}
+                    alt={testimonial.name}
                     className="w-12 h-12 rounded-full mr-4"
                   />
                   <div>
@@ -265,12 +266,12 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-      
+
       {/* Contact Section */}
       <section id="contact" className="py-16 bg-gray-100 dark:bg-gray-900">
         <div className="container-custom mx-auto">
           <div className="text-center mb-12">
-            <motion.h2 
+            <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -279,7 +280,7 @@ const HomePage = () => {
             >
               Contact Us
             </motion.h2>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -289,7 +290,7 @@ const HomePage = () => {
               Have questions or need assistance? Reach out to our team and we'll get back to you as soon as possible.
             </motion.p>
           </div>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Contact Form */}
             <motion.div
@@ -355,7 +356,7 @@ const HomePage = () => {
                 </button>
               </form>
             </motion.div>
-            
+
             {/* Map and Contact Info */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
@@ -375,7 +376,7 @@ const HomePage = () => {
                   title="Our Location"
                 ></iframe>
               </div>
-              
+
               {/* Contact Information */}
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                 <h3 className="text-xl font-semibold mb-4">Contact Information</h3>
@@ -392,7 +393,7 @@ const HomePage = () => {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start">
                     <div className="bg-primary bg-opacity-10 p-2 rounded-full mr-3">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary" viewBox="0 0 20 20" fill="currentColor">
@@ -408,7 +409,7 @@ const HomePage = () => {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start">
                     <div className="bg-primary bg-opacity-10 p-2 rounded-full mr-3">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary" viewBox="0 0 20 20" fill="currentColor">
@@ -425,7 +426,7 @@ const HomePage = () => {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start">
                     <div className="bg-primary bg-opacity-10 p-2 rounded-full mr-3">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary" viewBox="0 0 20 20" fill="currentColor">
@@ -447,11 +448,11 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-      
+
       {/* CTA Section */}
       <section className="py-16 bg-primary">
         <div className="container-custom mx-auto text-center">
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -460,7 +461,7 @@ const HomePage = () => {
           >
             Ready to Find Your Dream Home?
           </motion.h2>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -476,14 +477,14 @@ const HomePage = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4"
           >
-            <a 
-              href="/properties" 
+            <a
+              href="/properties"
               className="btn bg-white text-primary hover:bg-gray-100 py-3 px-8 text-lg"
             >
               Browse Properties
             </a>
-            <a 
-              href="/register" 
+            <a
+              href="/register"
               className="btn border-2 border-white text-white hover:bg-white hover:text-primary py-3 px-8 text-lg"
             >
               Create an Account

@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
-import { doc, getDoc } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore";
 import { db } from "../firebase"; // Adjust the path to your Firebase config
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css"; // Import Leaflet CSS
@@ -22,6 +22,8 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import PersonIcon from "@mui/icons-material/Person";
 import PhoneIcon from "@mui/icons-material/Phone";
 import EmailIcon from "@mui/icons-material/Email";
+import { recordPageView } from "./admin/AnalyticsPage";
+import { useAuth } from "../contexts/AuthContext";
 
 const PropertyDetailsPage = () => {
   const { id } = useParams(); // Get the `id` from the URL
@@ -30,6 +32,9 @@ const PropertyDetailsPage = () => {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showShareOptions, setShowShareOptions] = useState(false);
   const [map, setMap] = useState(null); // State to hold the map instance
+  const [isFavorite, setIsFavorite] = useState(false);
+  const hasRecordedView = useRef(false);
+  const { currentUser } = useAuth();
 
   // Fetch property data from Firebase
   useEffect(() => {
@@ -50,8 +55,60 @@ const PropertyDetailsPage = () => {
       }
     };
 
+    if (!hasRecordedView.current) {
+      recordPageView(id);
+      hasRecordedView.current = true; // Mark as recorded
+    }
     fetchProperty();
   }, [id]);
+
+
+  // Check if the property is favorited by the current user
+  useEffect(() => {
+    const checkIfFavorite = async () => {
+      if (currentUser) {
+        const favoritesQuery = query(
+          collection(db, "favorites"),
+          where("userId", "==", currentUser.uid),
+          where("propertyId", "==", id)
+        );
+        const querySnapshot = await getDocs(favoritesQuery);
+        setIsFavorite(!querySnapshot.empty);
+      }
+    };
+
+    checkIfFavorite();
+  }, [currentUser, id]);
+  //Handle adding/removing from favorites
+  const toggleFavorite = async () => {
+    if (!currentUser) {
+      alert("Please log in to save properties to your favorites.");
+      return;
+    }
+
+    try {
+      const favoriteRef = doc(db, "favorites", `${currentUser.uid}_${id}`);
+
+      if (isFavorite) {
+        // Remove from favorites
+        await deleteDoc(favoriteRef);
+        setIsFavorite(false);
+        alert("Property removed from favorites.");
+      } else {
+        // Add to favorites
+        await setDoc(favoriteRef, {
+          userId: currentUser.uid,
+          propertyId: id,
+          createdAt: new Date(),
+        });
+        setIsFavorite(true);
+        alert("Property added to favorites.");
+      }
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+    }
+  };
+
 
   // Handle loading state
   if (loading) {
@@ -175,11 +232,15 @@ const PropertyDetailsPage = () => {
 
           <div className="flex items-center space-x-4 mt-4 md:mt-0">
             <button
-              onClick={() => alert("Save functionality not implemented yet")}
+              onClick={toggleFavorite}
               className="flex items-center space-x-1 px-3 py-2 rounded-md bg-white dark:bg-gray-800 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
-              <FavoriteBorderIcon className="text-gray-600 dark:text-gray-300" />
-              <span>Save</span>
+              {isFavorite ? (
+                <FavoriteIcon className="text-red-500" />
+              ) : (
+                <FavoriteBorderIcon className="text-gray-600 dark:text-gray-300" />
+              )}
+              <span>{isFavorite ? "Saved" : "Save"}</span>
             </button>
 
             <div className="relative">

@@ -98,55 +98,6 @@ export const PropertyProvider = ({ children }) => {
     });
   };
 
-  // const getSavedProperties = () => {
-  //   return properties.filter(property => savedProperties.includes(property.id));
-  // };
-
-  // const addProperty = async (property) => {
-  //   try {
-  //     // Add new property to Firestore
-  //     const docRef = await addDoc(collection(db, 'Properties'), property);
-  //     console.log('Document written with ID: ', docRef.id);
-
-  //     // Update local state
-  //     const newProperty = { ...property, id: docRef.id };
-  //     setProperties(prev => [...prev, newProperty]);
-  //     return newProperty;
-  //   } catch (error) {
-  //     console.error('Error adding property:', error);
-  //   }
-  // };
-
-  // const updateProperty = async (id, updates) => {
-  //   try {
-  //     // Update property in Firestore
-  //     const propertyRef = doc(db, 'Properties', id);
-  //     await updateDoc(propertyRef, updates);
-
-  //     // Update local state
-  //     setProperties(prev =>
-  //       prev.map(property =>
-  //         property.id === id ? { ...property, ...updates } : property
-  //       )
-  //     );
-  //   } catch (error) {
-  //     console.error('Error updating property:', error);
-  //   }
-  // };
-
-  // const deleteProperty = async (id) => {
-  //   try {
-  //     // Delete property from Firestore
-  //     const propertyRef = doc(db, 'Properties', id);
-  //     await deleteDoc(propertyRef);
-
-  //     // Update local state
-  //     setProperties(prev => prev.filter(property => property.id !== id));
-  //   } catch (error) {
-  //     console.error('Error deleting property:', error);
-  //   }
-  // };
-
   const value = {
     properties,
     featuredProperties,
@@ -156,10 +107,6 @@ export const PropertyProvider = ({ children }) => {
     getPropertyById,
     searchProperties,
     toggleSaveProperty,
-    // getSavedProperties,
-    // addProperty,
-    // updateProperty,
-    // deleteProperty
   };
 
   return (

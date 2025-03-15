@@ -27,6 +27,8 @@ import ChatWidget from './components/chat/ChatWidget'
 import NotificationCenter from './components/notifications/NotificationCenter'
 import ScrollToTop from './components/common/ScrollToTop'
 import PropertyEditForm from './components/admin/PropertyEditForm'
+import RegisterPage from './pages/RegisterPage'
+import ProfilePage from './pages/ProfilePage'
 
 function App() {
   const location = useLocation()
@@ -56,17 +58,17 @@ function App() {
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           {/* Public Routes */}
+          <Route path="login" element={<LoginPage />} />
+          <Route path='Register' element={<RegisterPage />} />
           <Route path="/" element={<MainLayout />}>
             <Route index element={<HomePage />} />
             <Route path="properties" element={<PropertySearchPage />} />
             <Route path="properties/:id" element={<PropertyDetailsPage />} />
-            <Route path="login" element={<LoginPage />} />
-            {/* <Route path="register" element={<RegisterPage />} /> */}
+            <Route path="profile" element={<ProfilePage
+            />} />
 
             {/* Protected Routes */}
-            <Route element={<ProtectedRoute />}>
-              {/* <Route path="profile" element={<ProfilePage />} /> */}
-            </Route>
+
 
             {/* Admin Routes */}
             <Route path="admin" element={
@@ -77,7 +79,7 @@ function App() {
               <Route index element={<AdminDashboardPage />} />
               <Route path="properties" element={<AdminPropertiesPage />} />
               <Route path="users" element={<AdminUsersPage />} />
-              <Route path="propertyEdit/:id" element={<PropertyEditForm />} /> 
+              <Route path="propertyEdit/:id" element={<PropertyEditForm />} />
               {/* <Route path="analytics" element={<AdminAnalyticsPage />} /> */}
             </Route>
 

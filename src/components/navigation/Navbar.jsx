@@ -5,7 +5,6 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNotification } from '../../contexts/NotificationContext'
 import { useChat } from '../../contexts/ChatContext'
-
 // MUI Icons
 import MenuIcon from '@mui/icons-material/Menu'
 import CloseIcon from '@mui/icons-material/Close'
@@ -64,8 +63,8 @@ const Navbar = () => {
 
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-          ? 'bg-white dark:bg-gray-900 shadow-md py-2'
-          : 'bg-transparent py-4'
+        ? 'bg-white dark:bg-gray-900 shadow-md py-2'
+        : 'bg-transparent py-4'
         }`}
     >
       <div className="container-custom mx-auto">

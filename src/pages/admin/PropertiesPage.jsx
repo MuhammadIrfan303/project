@@ -8,7 +8,6 @@ const PropertiesPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingProperty, setEditingProperty] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-
   useEffect(() => {
     document.title = 'Manage Properties | Admin Dashboard';
 

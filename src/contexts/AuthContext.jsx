@@ -1,147 +1,75 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react';
+import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth';
+import { auth, db } from './../firebase';
+import { doc, getDoc, setDoc, Timestamp } from 'firebase/firestore';
 
-// Mock Firebase Auth for now - would be replaced with actual Firebase implementation
-const mockAuth = {
-  currentUser: null,
-  onAuthStateChanged: (callback) => {
-    // Simulate auth state change after 1 second
-    setTimeout(() => {
-      callback(null)
-    }, 1000)
-    return () => {}
-  },
-  signInWithEmailAndPassword: (email, password) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        if (email === 'admin@example.com' && password === 'password') {
-          mockAuth.currentUser = {
-            uid: '1',
-            email,
-            displayName: 'Admin User',
-            photoURL: 'https://via.placeholder.com/150',
-            emailVerified: true,
-            role: 'admin'
-          }
-        } else if (email && password) {
-          mockAuth.currentUser = {
-            uid: '2',
-            email,
-            displayName: 'Regular User',
-            photoURL: 'https://via.placeholder.com/150',
-            emailVerified: true,
-            role: 'user'
-          }
-        }
-        resolve({ user: mockAuth.currentUser })
-      }, 1000)
-    })
-  },
-  createUserWithEmailAndPassword: (email, password) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        mockAuth.currentUser = {
-          uid: '2',
-          email,
-          displayName: null,
-          photoURL: null,
-          emailVerified: false,
-          role: 'user'
-        }
-        resolve({ user: mockAuth.currentUser })
-      }, 1000)
-    })
-  },
-  signOut: () => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        mockAuth.currentUser = null
-        resolve()
-      }, 1000)
-    })
-  },
-  updateProfile: (user, data) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        mockAuth.currentUser = { ...mockAuth.currentUser, ...data }
-        resolve()
-      }, 1000)
-    })
-  }
-}
+const AuthContext = createContext();
 
-const AuthContext = createContext()
-
-export const useAuth = () => useContext(AuthContext)
+export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [currentUser, setCurrentUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = mockAuth.onAuthStateChanged(user => {
-      setCurrentUser(user)
-      setLoading(false)
-    })
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Get user data including role and last login from Firestore
+        const userDoc = await getDoc(doc(db, 'Users', user.uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setCurrentUser({ ...user, ...userData });
+        } else {
+          setCurrentUser(user);
+        }
+      } else {
+        setCurrentUser(null);
+      }
+      setLoading(false);
+    });
 
-    return unsubscribe
-  }, [])
-
+    return unsubscribe;
+  }, []);
   const login = async (email, password) => {
-    try {
-      const result = await mockAuth.signInWithEmailAndPassword(email, password)
-      setCurrentUser(result.user)
-      return result.user
-    } catch (error) {
-      throw error
-    }
-  }
+    const result = await signInWithEmailAndPassword(auth, email, password);
 
-  const register = async (email, password, displayName) => {
-    try {
-      const result = await mockAuth.createUserWithEmailAndPassword(email, password)
-      await mockAuth.updateProfile(result.user, { displayName })
-      setCurrentUser({ ...result.user, displayName })
-      return result.user
-    } catch (error) {
-      throw error
-    }
-  }
+    // Update last login time in Firestore
+    await setDoc(doc(db, 'Users', result.user.uid), {
+      lastLogin: Timestamp.now(),
+    }, { merge: true });
 
-  const logout = async () => {
-    try {
-      await mockAuth.signOut()
-      setCurrentUser(null)
-    } catch (error) {
-      throw error
-    }
-  }
+    // Get updated user data including last login
+    const userDoc = await getDoc(doc(db, 'Users', result.user.uid));
+    const userData = userDoc.data();
+    setCurrentUser({ ...result.user, ...userData });
 
-  const updateUserProfile = async (data) => {
-    try {
-      await mockAuth.updateProfile(currentUser, data)
-      setCurrentUser(prev => ({ ...prev, ...data }))
-    } catch (error) {
-      throw error
-    }
-  }
+    return result.user;
+  };
+  const register = async (email, password, userData) => {
+    const result = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(result.user, { displayName: `${userData.firstName} ${userData.lastName}` });
+    await setDoc(doc(db, 'Users', result.user.uid), {
+      email,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      status: "save",
+      role: 'user',
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+    });
+    setCurrentUser(result.user);
+    return result.user;
+  };
 
-  const isAdmin = () => {
-    return currentUser?.role === 'admin'
-  }
+  const logout = () => {
+    auth.signOut();
+    setCurrentUser(null);
+  };
+  // logout
 
-  const value = {
-    currentUser,
-    login,
-    register,
-    logout,
-    updateUserProfile,
-    isAdmin,
-    loading
-  }
+  const isAdmin = () => currentUser?.role === 'admin';
 
-  return (
-    <AuthContext.Provider value={value}>
-      {!loading && children}
-    </AuthContext.Provider>
-  )
-}
+  const value = { currentUser, login, register, logout, isAdmin, loading };
+
+  return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>;
+};

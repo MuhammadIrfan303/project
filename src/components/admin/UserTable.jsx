@@ -10,44 +10,47 @@ import SearchIcon from '@mui/icons-material/Search'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 
-const UserTable = ({ users, onEdit, onDelete, onToggleStatus }) => {
+const UserTable = ({ users }) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
   const [sortBy, setSortBy] = useState('newest')
-  
+
   // Filter and sort users
   const filteredUsers = users
     .filter(user => {
       // Search filter
-      const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           user.email.toLowerCase().includes(searchTerm.toLowerCase())
-      
+      const matchesSearch = user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+
       // Role filter
       const matchesRole = roleFilter === 'all' || user.role === roleFilter
-      
+
       // Status filter
-      const matchesStatus = statusFilter === 'all' || 
-                           (statusFilter === 'active' && user.status === 'active') ||
-                           (statusFilter === 'inactive' && user.status === 'inactive')
-      
+      const matchesStatus = statusFilter === 'all' ||
+        (statusFilter === 'active' && user.status === 'active') ||
+        (statusFilter === 'inactive' && user.status === 'inactive')
+
       return matchesSearch && matchesRole && matchesStatus
     })
+    // ... existing code ...
     .sort((a, b) => {
       switch (sortBy) {
         case 'newest':
-          return new Date(b.createdAt) - new Date(a.createdAt)
+          return new Date(b.createdAt?.seconds ? b.createdAt.seconds * 1000 : b.createdAt) -
+            new Date(a.createdAt?.seconds ? a.createdAt.seconds * 1000 : a.createdAt)
         case 'oldest':
-          return new Date(a.createdAt) - new Date(b.createdAt)
+          return new Date(a.createdAt?.seconds ? a.createdAt.seconds * 1000 : a.createdAt) -
+            new Date(b.createdAt?.seconds ? b.createdAt.seconds * 1000 : b.createdAt)
         case 'name-asc':
-          return a.name.localeCompare(b.name)
+          return (a.firstName || '').localeCompare(b.firstName || '')
         case 'name-desc':
-          return b.name.localeCompare(a.name)
+          return (b.firstName || '').localeCompare(a.firstName || '')
         default:
           return 0
       }
     })
-  
+  // ... existing code ...
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
       {/* Filters */}
@@ -64,10 +67,10 @@ const UserTable = ({ users, onEdit, onDelete, onToggleStatus }) => {
             />
             <SearchIcon className="absolute left-3 top-2.5 text-gray-500 dark:text-gray-400" />
           </div>
-          
+
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Role Filter */}
-            <div className="flex items-center">
+            {/* <div className="flex items-center">
               <label htmlFor="role-filter" className="text-sm font-medium text-gray-700 dark:text-gray-300 mr-2">
                 Role:
               </label>
@@ -85,7 +88,7 @@ const UserTable = ({ users, onEdit, onDelete, onToggleStatus }) => {
             </div>
             
             {/* Status Filter */}
-            <div className="flex items-center">
+            {/* <div className="flex items-center">
               <label htmlFor="status-filter" className="text-sm font-medium text-gray-700 dark:text-gray-300 mr-2">
                 Status:
               </label>
@@ -99,8 +102,8 @@ const UserTable = ({ users, onEdit, onDelete, onToggleStatus }) => {
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </select>
-            </div>
-            
+            </div> */}
+
             {/* Sort */}
             <div className="flex items-center">
               <label htmlFor="sort-by" className="text-sm font-medium text-gray-700 dark:text-gray-300 mr-2">
@@ -121,7 +124,7 @@ const UserTable = ({ users, onEdit, onDelete, onToggleStatus }) => {
           </div>
         </div>
       </div>
-      
+
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -142,9 +145,9 @@ const UserTable = ({ users, onEdit, onDelete, onToggleStatus }) => {
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Last Login
               </th>
-              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              {/* <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Actions
-              </th>
+              </th> */}
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -178,40 +181,44 @@ const UserTable = ({ users, onEdit, onDelete, onToggleStatus }) => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        user.role === 'admin'
-                          ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:bg-opacity-30 dark:text-purple-300'
-                          : user.role === 'agent'
-                            ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:bg-opacity-30 dark:text-blue-300'
-                            : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-                      }`}>
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === 'admin'
+                        ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:bg-opacity-30 dark:text-purple-300'
+                        : user.role === 'user'
+                          ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:bg-opacity-30 dark:text-blue-300'
+                          : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                        }`}>
                         {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        user.status === 'active'
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:bg-opacity-30 dark:text-green-300'
-                          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:bg-opacity-30 dark:text-red-300'
-                      }`}>
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.status === 'active'
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:bg-opacity-30 dark:text-green-300'
+                        : 'bg-red-100 text-red-800 dark:bg-red-900 dark:bg-opacity-30 dark:text-red-300'
+                        }`}>
                         {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                      {new Date(user.createdAt).toLocaleDateString()}
+                      {user.createdAt?.seconds ?
+                        new Date(user.createdAt.seconds * 1000).toLocaleDateString() :
+                        new Date(user.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                      {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never'}
+                      {user.lastLogin ? (
+                        <>
+                          {new Date(user.lastLogin.toDate()).toLocaleDateString()} {/* Date */}
+
+                        </>
+                      ) : 'Never'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    {/* <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end space-x-2">
                         <button
                           onClick={() => onToggleStatus(user.id)}
-                          className={`${
-                            user.status === 'active'
-                              ? 'text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300'
-                              : 'text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300'
-                          }`}
+                          className={`${user.status === 'active'
+                            ? 'text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300'
+                            : 'text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300'
+                            }`}
                           aria-label={user.status === 'active' ? 'Deactivate user' : 'Activate user'}
                         >
                           {user.status === 'active' ? (
@@ -220,13 +227,7 @@ const UserTable = ({ users, onEdit, onDelete, onToggleStatus }) => {
                             <VerifiedIcon fontSize="small" />
                           )}
                         </button>
-                        <button
-                          onClick={() => onEdit(user)}
-                          className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
-                          aria-label="Edit user"
-                        >
-                          <EditIcon fontSize="small" />
-                        </button>
+                     
                         <button
                           onClick={() => onDelete(user.id)}
                           className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
@@ -235,7 +236,7 @@ const UserTable = ({ users, onEdit, onDelete, onToggleStatus }) => {
                           <DeleteIcon fontSize="small" />
                         </button>
                       </div>
-                    </td>
+                    </td> */}
                   </motion.tr>
                 ))
               ) : (

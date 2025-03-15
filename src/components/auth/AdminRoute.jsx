@@ -1,8 +1,9 @@
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 
 const AdminRoute = ({ children }) => {
-  const { currentUser, isAdmin, loading } = useAuth()
+  const { currentUser, loading } = useAuth()
+  const location = useLocation()
 
   if (loading) {
     return (
@@ -12,10 +13,13 @@ const AdminRoute = ({ children }) => {
     )
   }
 
-  // if (!currentUser || !isAdmin()) {
-  //   return <Navigate to="/login" />
-  // }
+  // Check if user exists and has admin role
+  if (!currentUser || currentUser.role !== 'admin') {
+    // Redirect to login with the attempted location
+    return <Navigate to="/" state={{ from: location }} replace />
+  }
 
+  // If admin, allow access to admin routes
   return children
 }
 
