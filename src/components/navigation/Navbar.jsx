@@ -1,385 +1,349 @@
-import { useState, useEffect } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useAuth } from '../../contexts/AuthContext'
-import { useTheme } from '../../contexts/ThemeContext'
-import { useNotification } from '../../contexts/NotificationContext'
-import { useChat } from '../../contexts/ChatContext'
-// MUI Icons
-import MenuIcon from '@mui/icons-material/Menu'
-import CloseIcon from '@mui/icons-material/Close'
-import SearchIcon from '@mui/icons-material/Search'
-import AccountCircleIcon from '@mui/icons-material/AccountCircle'
-import NotificationsIcon from '@mui/icons-material/Notifications'
-import ChatIcon from '@mui/icons-material/Chat'
-import DarkModeIcon from '@mui/icons-material/DarkMode'
-import LightModeIcon from '@mui/icons-material/LightMode'
-import Badge from '@mui/material/Badge'
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import {
+  FaSearch,
+  FaUser,
+  FaBars,
+  FaTimes,
+  FaFacebookF,
+  FaTwitter,
+  FaInstagram,
+  FaYoutube,
+  FaHome,
+  FaBuilding,
+  FaUserTie,
+  FaNewspaper,
+  FaAngleDown,
+  FaSignInAlt,
+  FaUserPlus,
+  FaUserCircle,
+  FaSignOutAlt
+} from 'react-icons/fa';
+import logo from '../../assets/logo.png';
 
 const Navbar = () => {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const { currentUser, logout, isAdmin } = useAuth()
-  const { theme, toggleTheme } = useTheme()
-  const { unreadCount } = useNotification()
-  const { getTotalUnreadCount, toggleChatWidget } = useChat()
-
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
+  const navigate = useNavigate();
+  const { currentUser, logout } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10)
-    }
-
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  useEffect(() => {
-    // Close mobile menu when route changes
-    setIsMenuOpen(false)
-  }, [location])
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleSearch = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/properties?search=${encodeURIComponent(searchQuery)}`)
-      setSearchQuery('')
+      navigate(`/properties?search=${encodeURIComponent(searchQuery)}`);
+      setSearchQuery('');
     }
-  }
+  };
 
   const handleLogout = async () => {
     try {
-      await logout()
-      navigate('/')
+      await logout();
+      navigate('/');
     } catch (error) {
-      console.error('Failed to log out', error)
+      console.error('Failed to log out', error);
     }
-  }
+  };
 
   return (
+    <header className={`sticky top-0 left-0 right-0 z-50 bg-white ${isScrolled ? 'shadow-md' : 'shadow-sm'}`}>
+      {/* Top Bar */}
+      <div className="bg-[#1B4168] text-white py-2 px-4">
+        <div className="container mx-auto flex justify-between items-center">
+          <div className="text-sm hidden sm:block">All Pakistan Real Estate Directory</div>
+          
+          <div className="flex items-center space-x-4">
+            <div className="hidden sm:block">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Property ID..."
+                  className="py-1 px-3 pr-8 text-sm rounded bg-white text-gray-800 w-40 md:w-48 focus:outline-none focus:ring-1 focus:ring-[#1B4168]"
+                />
+                <FaSearch className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500" size={14} />
+              </div>
+            </div>
 
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-        ? 'bg-white dark:bg-gray-900 shadow-md py-2'
-        : 'bg-transparent py-4'
-        }`}
-    >
-      <div className="container-custom mx-auto">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="flex items-center">
-            <span className="text-2xl font-bold text-primary dark:text-white">
-              RealEstate<span className="text-secondary">Hub</span>
-            </span>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
-            <Link
-              to="/"
-              className={`nav-link ${location.pathname === '/' ? 'text-primary font-medium' : 'text-gray-700 dark:text-gray-300'}`}
-            >
-              Home
-            </Link>
-            <Link
-              to="/properties"
-              className={`nav-link ${location.pathname.includes('/properties') ? 'text-primary font-medium' : 'text-gray-700 dark:text-gray-300'}`}
-            >
-              Properties
-            </Link>
-            <Link
-              to="/#about"
-              className="nav-link text-gray-700 dark:text-gray-300"
-            >
-              About
-            </Link>
-            <Link
-              to="/#contact"
-              className="nav-link text-gray-700 dark:text-gray-300"
-            >
-              Contact
-            </Link>
-          </nav>
-
-          {/* Search, Theme Toggle, Notifications, Chat, and Profile */}
-          <div className="hidden md:flex items-center space-x-4">
-            {/* Search Form */}
-            <form onSubmit={handleSearch} className="relative">
-              <input
-                type="text"
-                placeholder="Search properties..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-40 lg:w-60 py-2 pl-3 pr-10 rounded-full text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-              />
-              <button
-                type="submit"
-                className="absolute right-0 top-0 mt-2 mr-3 text-gray-500 dark:text-gray-400"
-              >
-                <SearchIcon fontSize="small" />
-              </button>
-            </form>
-
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-            >
-              {theme === 'dark' ? (
-                <LightModeIcon className="text-yellow-400" />
-              ) : (
-                <DarkModeIcon className="text-gray-700" />
-              )}
-            </button>
-
-            {currentUser && (
-              <>
-                {/* Notifications */}
-                <Link
-                  to="/profile?tab=notifications"
-                  className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                  aria-label="Notifications"
-                >
-                  <Badge badgeContent={unreadCount} color="error">
-                    <NotificationsIcon className="text-gray-700 dark:text-gray-300" />
-                  </Badge>
-                </Link>
-
-                {/* Chat */}
-                <button
-                  onClick={toggleChatWidget}
-                  className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                  aria-label="Chat"
-                >
-                  <Badge badgeContent={getTotalUnreadCount()} color="error">
-                    <ChatIcon className="text-gray-700 dark:text-gray-300" />
-                  </Badge>
-                </button>
-              </>
-            )}
-
-            {/* Auth Buttons or Profile */}
-            {currentUser ? (
-              <div className="relative group">
-                <button className="flex items-center space-x-2 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                  {currentUser.photoURL ? (
-                    <img
-                      src={currentUser.photoURL}
-                      alt={currentUser.displayName || 'User'}
-                      className="w-8 h-8 rounded-full"
-                    />
-                  ) : (
-                    <AccountCircleIcon className="text-gray-700 dark:text-gray-300" />
+            <div className="hidden md:flex items-center space-x-4">
+              {currentUser ? (
+                <>
+                  {currentUser?.role === 'admin' && (
+                    <Link to="/admin" className="text-white hover:text-gray-200 text-sm flex items-center">
+                      <FaUserCircle className="mr-1" />
+                      Admin
+                    </Link>
                   )}
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {currentUser.displayName || 'User'}
-                  </span>
-                </button>
-
-                {/* Dropdown Menu */}
-                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                  <Link
-                    to="/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    Profile
-                  </Link>
-
-                  {isAdmin() && (
-                    <Link
-                      to="/admin"
-                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                      Admin Dashboard
+                  {currentUser?.role === 'advisor' && (
+                    <Link to="/advisor/Dashbord" className="text-white hover:text-gray-200 text-sm flex items-center">
+                      <FaUserTie className="mr-1" />
+                      Advisor
+                    </Link>
+                  )}
+                  {currentUser?.role === 'user' && (
+                    <Link to="/profile" className="text-white hover:text-gray-200 text-sm flex items-center">
+                      <FaUser className="mr-1" />
+                      Profile
                     </Link>
                   )}
 
                   <button
                     onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="text-white hover:text-gray-200 text-sm flex items-center"
                   >
+                    <FaSignOutAlt className="mr-1" />
                     Logout
                   </button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" className="text-white hover:text-gray-200 text-sm flex items-center">
+                    <FaSignInAlt className="mr-1" />
+                    Login
+                  </Link>
+                  <Link to="/register" className="text-white hover:text-gray-200 text-sm flex items-center">
+                    <FaUserPlus className="mr-1" />
+                    Register
+                  </Link>
+                </>
+              )}
+            </div>
+
+            <div className="flex space-x-3">
+              <a href="#" className="hover:text-gray-200 transition-colors">
+                <FaFacebookF size={14} />
+              </a>
+              <a href="#" className="hover:text-gray-200 transition-colors">
+                <FaTwitter size={14} />
+              </a>
+              <a href="#" className="hover:text-gray-200 transition-colors">
+                <FaInstagram size={14} />
+              </a>
+              <a href="#" className="hover:text-gray-200 transition-colors">
+                <FaYoutube size={14} />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Navigation */}
+      <div className="border-b border-gray-100">
+        <div className="container mx-auto py-3 px-4">
+          <div className="flex items-center justify-between">
+            <Link to="/" className="flex items-center">
+              <img src={logo} alt="PakRealEstate" className="h-10 md:h-12" />
+            </Link>
+
+            <nav className="hidden md:flex items-center space-x-6">
+              <Link to="/" className="flex items-center gap-2 text-gray-700 hover:text-[#1B4168] font-medium">
+                <FaHome className="text-lg" />
+                <span>Home</span>
+              </Link>
+
+              <div className="relative group">
+                <button
+                  className="flex items-center gap-2 text-gray-700 hover:text-[#1B4168] font-medium"
+                  onMouseEnter={() => setIsDropdownOpen(true)}
+                  onMouseLeave={() => setIsDropdownOpen(false)}
+                >
+                  <FaBuilding className="text-lg" />
+                  <span>Properties</span>
+                  <FaAngleDown className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                <div
+                  className={`absolute top-full left-0 w-48 bg-white shadow-lg rounded-md py-2 transition-all ${isDropdownOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
+                  onMouseEnter={() => setIsDropdownOpen(true)}
+                  onMouseLeave={() => setIsDropdownOpen(false)}
+                >
+                  <Link to="/properties?type=house" className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-[#1B4168]">Houses</Link>
+                  <Link to="/properties?type=apartment" className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-[#1B4168]">Apartments</Link>
+                  <Link to="/properties?type=commercial" className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-[#1B4168]">Commercial</Link>
+                  <Link to="/properties?type=plot" className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-[#1B4168]">Plots</Link>
+                  <div className="border-t border-gray-100 my-1"></div>
+                  <Link to="/properties" className="block px-4 py-2 text-[#1B4168] font-medium hover:bg-gray-50">
+                    View All →
+                  </Link>
                 </div>
               </div>
-            ) : (
-              <div className="flex items-center space-x-2">
-                <Link
-                  to="/login"
-                  className="px-4 py-2 text-sm font-medium text-primary border border-primary rounded-md hover:bg-primary hover:text-white transition-colors"
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/register"
-                  className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary-dark transition-colors"
-                >
-                  Register
-                </Link>
-              </div>
-            )}
-          </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-            aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
-          >
-            {isMenuOpen ? <CloseIcon /> : <MenuIcon />}
-          </button>
+              <Link to="/advisor" className="flex items-center gap-2 text-gray-700 hover:text-[#1B4168] font-medium">
+                <FaUserTie className="text-lg" />
+                <span>Find Advisor</span>
+              </Link>
+
+              <Link to="/blogs" className="flex items-center gap-2 text-gray-700 hover:text-[#1B4168] font-medium">
+                <FaNewspaper className="text-lg" />
+                <span>Blog</span>
+              </Link>
+            </nav>
+
+            <button 
+              onClick={() => setIsMenuOpen(!isMenuOpen)} 
+              className="md:hidden text-gray-700 focus:outline-none"
+            >
+              {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Mobile Menu */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="md:hidden bg-white dark:bg-gray-900 shadow-lg"
-          >
-            <div className="container-custom mx-auto py-4">
-              {/* Mobile Search */}
-              <form onSubmit={handleSearch} className="mb-4">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search properties..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full py-2 pl-3 pr-10 rounded-md text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                  />
+      {isMenuOpen && (
+        <div className="md:hidden bg-white border-t border-gray-100">
+          <div className="container mx-auto px-4 py-3">
+            <nav className="flex flex-col space-y-3">
+              {currentUser ? (
+                <>
+                  {currentUser?.role === 'admin' && (
+                    <Link 
+                      to="/admin" 
+                      className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:text-[#1B4168] hover:bg-gray-50 rounded-md"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <FaUserCircle />
+                      Admin Dashboard
+                    </Link>
+                  )}
+                  {currentUser?.role === 'advisor' && (
+                    <Link 
+                      to="/advisor/Dashbord" 
+                      className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:text-[#1B4168] hover:bg-gray-50 rounded-md"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <FaUserTie />
+                      Advisor Dashboard
+                    </Link>
+                  )}
                   <button
-                    type="submit"
-                    className="absolute right-0 top-0 mt-2 mr-3 text-gray-500 dark:text-gray-400"
+                    onClick={() => {
+                      handleLogout();
+                      setIsMenuOpen(false);
+                    }}
+                    className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:text-[#1B4168] hover:bg-gray-50 rounded-md text-left"
                   >
-                    <SearchIcon fontSize="small" />
+                    <FaSignOutAlt />
+                    Logout
                   </button>
-                </div>
-              </form>
+                </>
+              ) : (
+                <>
+                  <Link 
+                    to="/login" 
+                    className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:text-[#1B4168] hover:bg-gray-50 rounded-md"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <FaSignInAlt />
+                    Login
+                  </Link>
+                  <Link 
+                    to="/register" 
+                    className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:text-[#1B4168] hover:bg-gray-50 rounded-md"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <FaUserPlus />
+                    Register
+                  </Link>
+                </>
+              )}
 
-              {/* Mobile Navigation Links */}
-              <nav className="flex flex-col space-y-4">
-                <Link
-                  to="/"
-                  className={`py-2 ${location.pathname === '/' ? 'text-primary font-medium' : 'text-gray-700 dark:text-gray-300'}`}
+              <div className="border-t border-gray-200 my-1"></div>
+
+              <Link 
+                to="/" 
+                className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:text-[#1B4168] hover:bg-gray-50 rounded-md"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <FaHome />
+                Home
+              </Link>
+
+              <div className="flex flex-col">
+                <button
+                  className="flex items-center justify-between gap-3 px-3 py-2 text-gray-700 hover:text-[#1B4168] hover:bg-gray-50 rounded-md"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 >
-                  Home
-                </Link>
-                <Link
-                  to="/properties"
-                  className={`py-2 ${location.pathname.includes('/properties') ? 'text-primary font-medium' : 'text-gray-700 dark:text-gray-300'}`}
-                >
-                  Properties
-                </Link>
-                <Link
-                  to="/#about"
-                  className="py-2 text-gray-700 dark:text-gray-300"
-                >
-                  About
-                </Link>
-                <Link
-                  to="/#contact"
-                  className="py-2 text-gray-700 dark:text-gray-300"
-                >
-                  Contact
-                </Link>
-              </nav>
-
-              {/* Mobile Auth or Profile */}
-              <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                {currentUser ? (
-                  <div className="flex flex-col space-y-4">
-                    <div className="flex items-center space-x-3">
-                      {currentUser.photoURL ? (
-                        <img
-                          src={currentUser.photoURL}
-                          alt={currentUser.displayName || 'User'}
-                          className="w-10 h-10 rounded-full"
-                        />
-                      ) : (
-                        <AccountCircleIcon fontSize="large" className="text-gray-700 dark:text-gray-300" />
-                      )}
-                      <div>
-                        <p className="font-medium text-gray-700 dark:text-gray-300">
-                          {currentUser.displayName || 'User'}
-                        </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {currentUser.email}
-                        </p>
-                      </div>
-                    </div>
-
-                    <Link
-                      to="/profile"
-                      className="py-2 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary"
-                    >
-                      Profile
-                    </Link>
-
-                    {isAdmin() && (
-                      <Link
-                        to="/admin"
-                        className="py-2 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary"
-                      >
-                        Admin Dashboard
-                      </Link>
-                    )}
-
-                    <button
-                      onClick={handleLogout}
-                      className="py-2 text-left text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary"
-                    >
-                      Logout
-                    </button>
+                  <div className="flex items-center gap-3">
+                    <FaBuilding />
+                    <span>Properties</span>
                   </div>
-                ) : (
-                  <div className="flex flex-col space-y-3">
-                    <Link
-                      to="/login"
-                      className="w-full py-2 text-center font-medium text-primary border border-primary rounded-md hover:bg-primary hover:text-white transition-colors"
+                  <FaAngleDown className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {isDropdownOpen && (
+                  <div className="pl-10 py-1 space-y-2">
+                    <Link 
+                      to="/properties?type=house" 
+                      className="block px-3 py-2 text-gray-700 hover:text-[#1B4168]"
+                      onClick={() => setIsMenuOpen(false)}
                     >
-                      Login
+                      Houses
                     </Link>
-                    <Link
-                      to="/register"
-                      className="w-full py-2 text-center font-medium text-white bg-primary rounded-md hover:bg-primary-dark transition-colors"
+                    <Link 
+                      to="/properties?type=apartment" 
+                      className="block px-3 py-2 text-gray-700 hover:text-[#1B4168]"
+                      onClick={() => setIsMenuOpen(false)}
                     >
-                      Register
+                      Apartments
+                    </Link>
+                    <Link 
+                      to="/properties?type=commercial" 
+                      className="block px-3 py-2 text-gray-700 hover:text-[#1B4168]"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Commercial
+                    </Link>
+                    <Link 
+                      to="/properties?type=plot" 
+                      className="block px-3 py-2 text-gray-700 hover:text-[#1B4168]"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Plots
+                    </Link>
+                    <Link 
+                      to="/properties" 
+                      className="block px-3 py-2 text-[#1B4168] font-medium"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      View All →
                     </Link>
                   </div>
                 )}
               </div>
 
-              {/* Mobile Theme Toggle */}
-              <div className="mt-6 flex justify-between items-center">
-                <span className="text-gray-700 dark:text-gray-300">
-                  {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-                </span>
-                <button
-                  onClick={toggleTheme}
-                  className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                >
-                  {theme === 'dark' ? (
-                    <LightModeIcon className="text-yellow-400" />
-                  ) : (
-                    <DarkModeIcon className="text-gray-700" />
-                  )}
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
-  )
-}
+              <Link 
+                to="/advisor" 
+                className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:text-[#1B4168] hover:bg-gray-50 rounded-md"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <FaUserTie />
+                Find Advisor
+              </Link>
 
-export default Navbar
+              <Link 
+                to="/blogs" 
+                className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:text-[#1B4168] hover:bg-gray-50 rounded-md"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <FaNewspaper />
+                Blog
+              </Link>
+            </nav>
+          </div>
+        </div>
+      )}
+    </header>
+  );
+};
+
+export default Navbar;

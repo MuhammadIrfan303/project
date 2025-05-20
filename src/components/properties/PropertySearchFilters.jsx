@@ -10,7 +10,7 @@ import CloseIcon from '@mui/icons-material/Close'
 const PropertySearchFilters = ({ onSearch }) => {
   const [searchParams, setSearchParams] = useSearchParams()
   const [showAdvanced, setShowAdvanced] = useState(false)
-  
+
   const [filters, setFilters] = useState({
     location: '',
     minPrice: '',
@@ -22,16 +22,16 @@ const PropertySearchFilters = ({ onSearch }) => {
     maxArea: '',
     amenities: []
   })
-  
+
   // Available amenities for filtering
   const availableAmenities = [
     'Swimming Pool', 'Gym', 'Parking', 'Elevator', 'Security',
     'Balcony', 'Garden', 'Fireplace', 'Air Conditioning', 'Furnished'
   ]
-  
+
   // Property types
   const propertyTypes = ['apartment', 'house', 'condo', 'commercial', 'land']
-  
+
   useEffect(() => {
     // Initialize filters from URL params
     const location = searchParams.get('location') || ''
@@ -43,7 +43,7 @@ const PropertySearchFilters = ({ onSearch }) => {
     const minArea = searchParams.get('minArea') || ''
     const maxArea = searchParams.get('maxArea') || ''
     const amenities = searchParams.get('amenities') ? searchParams.get('amenities').split(',') : []
-    
+
     setFilters({
       location,
       minPrice,
@@ -55,22 +55,22 @@ const PropertySearchFilters = ({ onSearch }) => {
       maxArea,
       amenities
     })
-    
+
     // If there are advanced filters set, show the advanced section
-    if (minPrice || maxPrice || bedrooms || bathrooms || minArea || maxArea || amenities.length >  0) {
+    if (minPrice || maxPrice || bedrooms || bathrooms || minArea || maxArea || amenities.length > 0) {
       setShowAdvanced(true)
     }
   }, [searchParams])
-  
+
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setFilters(prev => ({ ...prev, [name]: value }))
   }
-  
+
   const handleAmenityToggle = (amenity) => {
     setFilters(prev => {
       const amenities = [...prev.amenities]
-      
+
       if (amenities.includes(amenity)) {
         return { ...prev, amenities: amenities.filter(a => a !== amenity) }
       } else {
@@ -78,13 +78,13 @@ const PropertySearchFilters = ({ onSearch }) => {
       }
     })
   }
-  
+
   const handleSearch = (e) => {
     e.preventDefault()
-    
+
     // Update URL params
     const params = {}
-    
+
     if (filters.location) params.location = filters.location
     if (filters.minPrice) params.minPrice = filters.minPrice
     if (filters.maxPrice) params.maxPrice = filters.maxPrice
@@ -94,13 +94,13 @@ const PropertySearchFilters = ({ onSearch }) => {
     if (filters.minArea) params.minArea = filters.minArea
     if (filters.maxArea) params.maxArea = filters.maxArea
     if (filters.amenities.length > 0) params.amenities = filters.amenities.join(',')
-    
+
     setSearchParams(params)
-    
+
     // Call the onSearch callback with the filters
     onSearch(filters)
   }
-  
+
   const clearFilters = () => {
     setFilters({
       location: '',
@@ -113,11 +113,11 @@ const PropertySearchFilters = ({ onSearch }) => {
       maxArea: '',
       amenities: []
     })
-    
+
     setSearchParams({})
     onSearch({})
   }
-  
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
       <form onSubmit={handleSearch}>
@@ -137,7 +137,7 @@ const PropertySearchFilters = ({ onSearch }) => {
               className="input dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             />
           </div>
-          
+
           <div className="w-full md:w-48">
             <label htmlFor="propertyType" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Property Type
@@ -157,7 +157,7 @@ const PropertySearchFilters = ({ onSearch }) => {
               ))}
             </select>
           </div>
-          
+
           <button
             type="submit"
             className="btn-primary py-3 px-6 flex items-center justify-center"
@@ -166,7 +166,7 @@ const PropertySearchFilters = ({ onSearch }) => {
             Search
           </button>
         </div>
-        
+
         {/* Advanced Filters Toggle */}
         <div className="flex justify-between items-center mb-4">
           <button
@@ -177,20 +177,20 @@ const PropertySearchFilters = ({ onSearch }) => {
             <FilterListIcon className="mr-1" fontSize="small" />
             {showAdvanced ? 'Hide Advanced Filters' : 'Show Advanced Filters'}
           </button>
-          
-          {(filters.minPrice || filters.maxPrice || filters.bedrooms || filters.bathrooms || 
+
+          {(filters.minPrice || filters.maxPrice || filters.bedrooms || filters.bathrooms ||
             filters.minArea || filters.maxArea || filters.amenities.length > 0) && (
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 text-sm flex items-center"
-            >
-              <CloseIcon className="mr-1" fontSize="small" />
-              Clear All Filters
-            </button>
-          )}
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 text-sm flex items-center"
+              >
+                <CloseIcon className="mr-1" fontSize="small" />
+                Clear All Filters
+              </button>
+            )}
         </div>
-        
+
         {/* Advanced Filters */}
         {showAdvanced && (
           <motion.div
@@ -226,7 +226,7 @@ const PropertySearchFilters = ({ onSearch }) => {
                   />
                 </div>
               </div>
-              
+
               {/* Bedrooms */}
               <div>
                 <label htmlFor="bedrooms" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -247,7 +247,7 @@ const PropertySearchFilters = ({ onSearch }) => {
                   <option value="5">5+</option>
                 </select>
               </div>
-              
+
               {/* Bathrooms */}
               <div>
                 <label htmlFor="bathrooms" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -267,7 +267,7 @@ const PropertySearchFilters = ({ onSearch }) => {
                   <option value="4">4+</option>
                 </select>
               </div>
-              
+
               {/* Area Range */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -294,7 +294,7 @@ const PropertySearchFilters = ({ onSearch }) => {
                 </div>
               </div>
             </div>
-            
+
             {/* Amenities */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

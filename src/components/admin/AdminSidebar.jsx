@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 
 // MUI Icons
@@ -6,43 +6,45 @@ import DashboardIcon from '@mui/icons-material/Dashboard'
 import HomeWorkIcon from '@mui/icons-material/HomeWork'
 import PeopleIcon from '@mui/icons-material/People'
 import BarChartIcon from '@mui/icons-material/BarChart'
-import SettingsIcon from '@mui/icons-material/Settings'
-import MessageIcon from '@mui/icons-material/Message'
+import { FaUsers, FaBuilding, FaBell, FaUserPlus, FaBlog } from 'react-icons/fa';
+import HomeIcon from '@mui/icons-material/Home'
 import LogoutIcon from '@mui/icons-material/Logout'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
+import NotificationsIcon from '@mui/icons-material/Notifications'
 import { useAuth } from '../../contexts/AuthContext'
 
 const AdminSidebar = ({ isOpen, toggleSidebar }) => {
   const { logout } = useAuth()
-  
+
   const sidebarVariants = {
-    open: { 
+    open: {
       width: '240px',
-      transition: { 
-        type: 'spring', 
-        stiffness: 300, 
-        damping: 30 
-      } 
+      transition: {
+        type: 'spring',
+        stiffness: 300,
+        damping: 30
+      }
     },
-    closed: { 
+    closed: {
       width: '70px',
-      transition: { 
-        type: 'spring', 
-        stiffness: 300, 
-        damping: 30 
-      } 
+      transition: {
+        type: 'spring',
+        stiffness: 300,
+        damping: 30
+      }
     }
   }
-  
+
   const navItems = [
     { path: '/admin', icon: <DashboardIcon />, label: 'Dashboard' },
     { path: '/admin/properties', icon: <HomeWorkIcon />, label: 'Properties' },
     { path: '/admin/users', icon: <PeopleIcon />, label: 'Users' },
-    { path: '/admin/analytics', icon: <BarChartIcon />, label: 'Analytics' },
-    { path: '/admin/messages', icon: <MessageIcon />, label: 'Messages' },
-    { path: '/admin/settings', icon: <SettingsIcon />, label: 'Settings' },
+    { path: '/admin/advisiors', icon: <FaUsers size={20} />, label: 'Advisiors' },
+
+    { path: '/admin/blogs', icon: <BarChartIcon />, label: 'Blogs' },
+
   ]
-  
+
   return (
     <motion.div
       variants={sidebarVariants}
@@ -72,7 +74,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
           <ChevronLeftIcon style={{ transform: isOpen ? 'rotate(0deg)' : 'rotate(180deg)' }} />
         </button>
       </div>
-      
+
       {/* Navigation Links */}
       <nav className="flex-1 py-4 overflow-y-auto">
         <ul className="space-y-2 px-2">
@@ -81,11 +83,10 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
               <NavLink
                 to={item.path}
                 end={item.path === '/admin'}
-                className={({ isActive }) => 
-                  `flex items-center p-2 rounded-md transition-colors ${
-                    isActive 
-                      ? 'bg-primary text-white' 
-                      : 'text-gray-300 hover:bg-gray-700'
+                className={({ isActive }) =>
+                  `flex items-center p-2 rounded-md transition-colors ${isActive
+                    ? 'bg-primary text-white'
+                    : 'text-gray-300 hover:bg-gray-700'
                   }`
                 }
               >
@@ -107,7 +108,29 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
           ))}
         </ul>
       </nav>
-      
+
+      {/* Visit Website Button - Add this before the Logout Button */}
+      <div className="p-4 border-t border-gray-700">
+        <Link
+          to="/"
+          className="flex items-center w-full p-2 rounded-md text-gray-300 hover:bg-gray-700 transition-colors"
+        >
+          <HomeIcon />
+          <AnimatePresence>
+            {isOpen && (
+              <motion.span
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: 'auto' }}
+                exit={{ opacity: 0, width: 0 }}
+                className="ml-3"
+              >
+                Visit Website
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </Link>
+      </div>
+
       {/* Logout Button */}
       <div className="p-4 border-t border-gray-700">
         <button

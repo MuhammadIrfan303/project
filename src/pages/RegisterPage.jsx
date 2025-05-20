@@ -24,10 +24,31 @@ const RegisterPage = () => {
         try {
             setError('');
             setLoading(true);
+
+            // Password validation
+            if (formData.password.length < 6) {
+                throw { code: 'auth/weak-password' };
+            }
+
             await register(formData.email, formData.password, formData);
-            navigate('/');
+            navigate('/Login');
         } catch (err) {
-            setError('Failed to create an account. Please try again.');
+            switch (err.code) {
+                case 'auth/email-already-in-use':
+                    setError('An account with this email already exists.');
+                    break;
+                case 'auth/invalid-email':
+                    setError('Please enter a valid email address.');
+                    break;
+                case 'auth/weak-password':
+                    setError('Password should be at least 6 characters long.');
+                    break;
+                case 'auth/network-request-failed':
+                    setError('Network error. Please check your internet connection.');
+                    break;
+                default:
+                    setError('Failed to create an account. Please try again.');
+            }
         } finally {
             setLoading(false);
         }
@@ -37,7 +58,14 @@ const RegisterPage = () => {
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
             <div className="max-w-md w-full bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-white/20">
                 <h1 className="text-4xl font-bold text-white text-center mb-6">Create Account</h1>
-                {error && <div className="bg-red-500/20 text-white p-4 rounded-xl mb-6">{error}</div>}
+                {error && (
+                    <div className="bg-red-500/20 backdrop-blur-sm text-white p-4 rounded-xl mb-6 flex items-center">
+                        <svg className="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                        </svg>
+                        <span>{error}</span>
+                    </div>
+                )}
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-2 gap-4">
                         <input type="text" name="firstName" placeholder="First Name" value={formData.firstName} onChange={handleChange} required className="w-full p-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-300" />

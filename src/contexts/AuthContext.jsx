@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth';
+import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import { auth, db } from './../firebase';
 import { doc, getDoc, setDoc, Timestamp } from 'firebase/firestore';
 
@@ -14,11 +14,12 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // Get user data including role and last login from Firestore
-        const userDoc = await getDoc(doc(db, 'Users', user.uid));
+        // Use user.email instead of email
+        const userDoc = await getDoc(doc(db, 'Users', user.email));
         if (userDoc.exists()) {
           const userData = userDoc.data();
           setCurrentUser({ ...user, ...userData });
+          console.log(userData);
         } else {
           setCurrentUser(user);
         }
@@ -30,46 +31,55 @@ export const AuthProvider = ({ children }) => {
 
     return unsubscribe;
   }, []);
+
+
   const login = async (email, password) => {
     const result = await signInWithEmailAndPassword(auth, email, password);
 
-    // Update last login time in Firestore
-    await setDoc(doc(db, 'Users', result.user.uid), {
-      lastLogin: Timestamp.now(),
-    }, { merge: true });
-
-    // Get updated user data including last login
-    const userDoc = await getDoc(doc(db, 'Users', result.user.uid));
-    const userData = userDoc.data();
-    setCurrentUser({ ...result.user, ...userData });
+    // Get updated user data including role using the correct UID
+    const userDoc = await getDoc(doc(db, 'Users', email));
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      setCurrentUser({ ...result.user, ...userData });
+    }
 
     return result.user;
   };
+
   const register = async (email, password, userData) => {
-    const result = await createUserWithEmailAndPassword(auth, email, password);
-    await updateProfile(result.user, { displayName: `${userData.firstName} ${userData.lastName}` });
-    await setDoc(doc(db, 'Users', result.user.uid), {
-      email,
-      firstName: userData.firstName,
-      lastName: userData.lastName,
-      status: "save",
-      role: 'user',
-      createdAt: Timestamp.now(),
-      updatedAt: Timestamp.now(),
-    });
-    setCurrentUser(result.user);
-    return result.user;
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+      await setDoc(doc(db, 'Users', userCredential.user.uid), {
+        ...userData,
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
+        uid: userCredential.user.uid,
+        role: 'user', // Default role is user
+        status: 'active'
+      });
+
+      return userCredential;
+    } catch (error) {
+      throw error;
+    }
   };
 
   const logout = () => {
-    auth.signOut();
+    signOut(auth);
     setCurrentUser(null);
   };
-  // logout
 
-  const isAdmin = () => currentUser?.role === 'admin';
 
-  const value = { currentUser, login, register, logout, isAdmin, loading };
+
+  const value = {
+    currentUser,
+    login,
+    register,
+    logout,
+
+    loading
+  };
 
   return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>;
 };

@@ -33,8 +33,8 @@ const PropertyCard = ({ property }) => {
 
   const formatPrice = (price) => {
     return property.status === 'for-rent'
-      ? `$${price.toLocaleString()}/mo`
-      : `$${price.toLocaleString()}`
+      ? `${price.toLocaleString()}PKR/mo`
+      : `${price.toLocaleString()}PKR`
   }
 
   return (
@@ -57,8 +57,8 @@ const PropertyCard = ({ property }) => {
           {/* Status Badge */}
           <div className="absolute top-4 left-4">
             <span className={`px-3 py-1 rounded-full text-xs font-semibold ${property.status === 'for-rent'
-                ? 'bg-secondary text-white'
-                : 'bg-primary text-white'
+              ? 'bg-secondary text-white'
+              : 'bg-primary text-white'
               }`}>
               {property.status === 'for-rent' ? 'For Rent' : 'For Sale'}
             </span>

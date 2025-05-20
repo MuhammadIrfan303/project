@@ -6,6 +6,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css"; // Import Leaflet CSS
 
 // MUI Icons
+// Remove these imports
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShareIcon from "@mui/icons-material/Share";
@@ -22,9 +23,20 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import PersonIcon from "@mui/icons-material/Person";
 import PhoneIcon from "@mui/icons-material/Phone";
 import EmailIcon from "@mui/icons-material/Email";
-import { recordPageView } from "./admin/AnalyticsPage";
-import { useAuth } from "../contexts/AuthContext";
 
+import { useAuth } from "../contexts/AuthContext";
+import { Toaster, toast } from 'react-hot-toast';
+
+// Add this import at the top
+import L from 'leaflet';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+// Add this before the component definition
+// Fix Leaflet default icon issue
+
+
+// Update the map section in your component
 const PropertyDetailsPage = () => {
   const { id } = useParams(); // Get the `id` from the URL
   const [property, setProperty] = useState(null); // State to store the property data
@@ -35,6 +47,8 @@ const PropertyDetailsPage = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const hasRecordedView = useRef(false);
   const { currentUser } = useAuth();
+  const [advisor, setAdvisor] = useState(null);
+  console.log(advisor);
 
   // Fetch property data from Firebase
   useEffect(() => {
@@ -55,10 +69,10 @@ const PropertyDetailsPage = () => {
       }
     };
 
-    if (!hasRecordedView.current) {
-      recordPageView(id);
-      hasRecordedView.current = true; // Mark as recorded
-    }
+    // if (!hasRecordedView.current) {
+    //   recordPageView(id);
+    //   hasRecordedView.current = true; // Mark as recorded
+    // }
     fetchProperty();
   }, [id]);
 
@@ -80,9 +94,66 @@ const PropertyDetailsPage = () => {
     checkIfFavorite();
   }, [currentUser, id]);
   //Handle adding/removing from favorites
+  // const toggleFavorite = async () => {
+  //   if (!currentUser) {
+  //     toast.error("Please log in to save properties to your favorites.");
+  //     return;
+  //   }
+
+  //   try {
+  //     const favoriteRef = doc(db, "favorites", `${currentUser.uid}_${id}`);
+
+  //     if (isFavorite) {
+  //       // Remove from favorites
+  //       await deleteDoc(favoriteRef);
+  //       setIsFavorite(false);
+  //       toast.success("Property removed from favorites");
+  //     } else {
+  //       // Add to favorites
+  //       await setDoc(favoriteRef, {
+  //         userId: currentUser.uid,
+  //         propertyId: id,
+  //         createdAt: new Date(),
+  //       });
+  //       setIsFavorite(true);
+  //       toast.success("Property added to favorites");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error toggling favorite:", error);
+  //     toast.error("Something went wrong. Please try again.");
+  //   }
+  // };
+  console.log(property?.advisorId)
+  // here we get the property advisor details
+  useEffect(() => {
+    const fetchPropertyAdvisor = async () => {
+      if (!property?.advisorId) return;
+
+      try {
+        const advisorRef = query(
+          collection(db, 'Users'),
+          where('uid', '==', property.advisorId)
+        );
+        const advisorSnap = await getDocs(advisorRef);
+
+        if (!advisorSnap.empty) {
+          const advisorData = advisorSnap.docs[0].data();
+          setAdvisor({ id: advisorSnap.docs[0].id, ...advisorData });
+        } else {
+          console.log('Advisor not found');
+        }
+      } catch (error) {
+        console.error('Error fetching advisor:', error);
+      }
+    };
+
+    fetchPropertyAdvisor();
+  }, [property?.advisorId]);
+
+  //Handle adding/removing from favorites
   const toggleFavorite = async () => {
     if (!currentUser) {
-      alert("Please log in to save properties to your favorites.");
+      toast.error("Please log in to save properties to your favorites.");
       return;
     }
 
@@ -93,7 +164,7 @@ const PropertyDetailsPage = () => {
         // Remove from favorites
         await deleteDoc(favoriteRef);
         setIsFavorite(false);
-        alert("Property removed from favorites.");
+        toast.success("Property removed from favorites");
       } else {
         // Add to favorites
         await setDoc(favoriteRef, {
@@ -102,13 +173,15 @@ const PropertyDetailsPage = () => {
           createdAt: new Date(),
         });
         setIsFavorite(true);
-        alert("Property added to favorites.");
+        toast.success("Property added to favorites");
       }
     } catch (error) {
       console.error("Error toggling favorite:", error);
+      toast.error("Something went wrong. Please try again.");
     }
   };
 
+  // here we get the property advisor details
 
   // Handle loading state
   if (loading) {
@@ -170,8 +243,8 @@ const PropertyDetailsPage = () => {
   // Format price based on property status
   const formatPrice = (price) => {
     return property.status === "for-rent"
-      ? `$${price.toLocaleString()}/mo`
-      : `$${price.toLocaleString()}`;
+      ? `${price.toLocaleString()}PKR/mo`
+      : `${price.toLocaleString()}PKR`;
   };
 
   // Handle image navigation
@@ -190,6 +263,8 @@ const PropertyDetailsPage = () => {
 
   return (
     <div className="min-h-screen pt-24 pb-16 bg-background-light dark:bg-gray-900">
+      <Toaster position="top-center" reverseOrder={false} />
+
       <div className="container-custom mx-auto">
         {/* Breadcrumbs */}
         <div className="mb-6">
@@ -279,7 +354,7 @@ const PropertyDetailsPage = () => {
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(window.location.href);
-                      alert("Link copied to clipboard!");
+                      toast.success("Link copied to clipboard!");
                       setShowShareOptions(false);
                     }}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -388,15 +463,59 @@ const PropertyDetailsPage = () => {
                 </div>
               </div>
 
+              {/* Advisor Quick Contact */}
+              {advisor && (
+                <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <div className="flex items-center gap-3 mb-3">
+                    <PersonIcon className="text-primary" />
+                    <div>
+                      <p className="font-semibold">{advisor.displayName}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{advisor.company}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 mb-2">
+                    <PhoneIcon className="text-primary text-sm" />
+                    <span className="text-sm">{advisor.phone}</span>
+                  </div>
+                </div>
+              )}
+
               {/* Contact Buttons */}
               <div className="space-y-3">
-                <button
-                  onClick={() => alert("Chat functionality not implemented yet")}
-                  className="btn-primary w-full py-3 flex items-center justify-center"
-                >
-                  <ChatIcon className="mr-2" />
-                  Chat with Agent
-                </button>
+                {advisor ? (
+                  <>
+                    <a
+                      href={`tel:${advisor.phone}`}
+                      className="btn-primary w-full py-3 flex items-center justify-center"
+                    >
+                      <PhoneIcon className="mr-2" />
+                      Call Advisor
+                    </a>
+                    <a
+                      href={`https://wa.me/${advisor.phone.replace(/\D/g, '')}?text=Hi, I'm interested in the property: ${property.title} (${window.location.href})`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-secondary w-full py-3 flex items-center justify-center bg-green-500 hover:bg-green-600 text-white"
+                    >
+                      <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+                      </svg>
+                      WhatsApp
+                    </a>
+                  </>
+                ) : (
+                  <a
+                    href={`https://wa.me/+923478409915?text=Hi, I'm interested in the property: ${property.title} (${window.location.href})`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-secondary w-full py-3 flex items-center justify-center bg-green-500 hover:bg-green-600 text-white"
+                  >
+                    <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+                    </svg>
+                    Contact via WhatsApp
+                  </a>
+                )}
               </div>
             </div>
           </div>
@@ -418,10 +537,10 @@ const PropertyDetailsPage = () => {
               <h2 className="text-2xl font-semibold mb-4">Property Details</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <div className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700">
+                  {/* <div className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700">
                     <span className="text-gray-600 dark:text-gray-400">Property ID</span>
                     <span className="font-medium">{property.id}</span>
-                  </div>
+                  </div> */}
                   <div className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700">
                     <span className="text-gray-600 dark:text-gray-400">Property Type</span>
                     <span className="font-medium capitalize">{property.type}</span>
@@ -468,45 +587,45 @@ const PropertyDetailsPage = () => {
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
               <h2 className="text-xl font-semibold mb-4">Location</h2>
               <div className="bg-gray-200 dark:bg-gray-700 h-64 rounded-lg mb-4 overflow-hidden relative">
-                <MapContainer
-                  center={[property.latitude, property.longitude]}
-                  zoom={15}
-                  scrollWheelZoom={false}
-                  style={{ width: "100%", height: "100%" }}
-                  whenCreated={setMap} // Store the map instance in state
-                >
-                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                  <SetView center={[property.latitude, property.longitude]} />
-                  <Marker position={[property.latitude, property.longitude]}>
-                    <Popup>
-                      <div className="text-center">
-                        <h3 className="font-bold text-lg">{property.title}</h3>
-                        <p className="text-sm text-gray-600">{property.address}</p>
-                      </div>
-                    </Popup>
-                  </Marker>
-                </MapContainer>
+                {property.latitude && property.longitude ? (
+                  <MapContainer
+                    center={[property.latitude, property.longitude]}
+                    zoom={15}
+                    style={{ height: '100%', width: '100%' }}
+                    whenCreated={setMap}
+                  >
+                    <TileLayer
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    <Marker
+                      position={[property.latitude, property.longitude]}
+                      icon={new L.Icon.Default()}
+                    >
+                      <Popup>
+                        <div className="text-center">
+                          <h3 className="font-bold">{property.title}</h3>
+                          <p className="text-sm">{property.address}</p>
+                        </div>
+                      </Popup>
+                    </Marker>
+                    <SetView center={[property.latitude, property.longitude]} />
+                  </MapContainer>
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <p className="text-gray-500">Location data not available</p>
+                  </div>
+                )}
 
-                {/* Custom Zoom Controls */}
+                {/* Zoom controls */}
                 <div className="absolute top-4 right-4 z-[1000] flex flex-col space-y-2">
                   <button
                     onClick={handleZoomIn}
                     className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors"
                     aria-label="Zoom In"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                      />
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
                   </button>
                   <button
@@ -514,19 +633,8 @@ const PropertyDetailsPage = () => {
                     className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors"
                     aria-label="Zoom Out"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M20 12H4"
-                      />
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
                     </svg>
                   </button>
                 </div>
@@ -551,6 +659,8 @@ const PropertyDetailsPage = () => {
                 </li>
               </ul>
             </div>
+
+
           </div>
         </div>
       </div>

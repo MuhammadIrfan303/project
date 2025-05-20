@@ -8,6 +8,7 @@ import ScrollToTopButton from '../components/common/ScrollToTopButton'
 const MainLayout = () => {
   const location = useLocation()
   const [showScrollButton, setShowScrollButton] = useState(false)
+  const isAdminRoute = location.pathname.startsWith('/admin')
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,7 +21,7 @@ const MainLayout = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar />
+      {!isAdminRoute && <Navbar />}
       
       <main className="flex-grow">
         <motion.div
@@ -34,7 +35,7 @@ const MainLayout = () => {
         </motion.div>
       </main>
       
-      <Footer />
+      {!isAdminRoute && <Footer />}
       
       {showScrollButton && <ScrollToTopButton />}
     </div>

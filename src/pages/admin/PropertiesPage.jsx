@@ -24,10 +24,7 @@ const PropertiesPage = () => {
     setShowForm(true);
   };
 
-  // const handleEditProperty = (property) => {
-  //   setEditingProperty(property);
-  //   setShowForm(true);
-  // };
+  
 
 
 
@@ -68,16 +65,12 @@ const PropertiesPage = () => {
 
         <PropertyForm
           setShowForm={setShowForm}
-        // property={editingProperty}
-        // // onSubmit={handleFormSubmit}
-        // onCancel={handleFormCancel}
+      
         />
       ) : (
         <PropertyTable
 
-        // onEdit={handleEditProperty}
-        // onDelete={handleDeleteProperty}
-        // onToggleFeatured={handleToggleFeatured}
+     
         />
       )}
     </div>

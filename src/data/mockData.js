@@ -174,28 +174,41 @@ export const mockProperties = [
     }
   }
 ];
-
 export const mockTestimonials = [
   {
     id: '1',
-    name: 'Jennifer Thompson',
+    name: 'Ayesha Khan',
     role: 'Home Buyer',
-    image: 'https://randomuser.me/api/portraits/women/67.jpg',
+    image: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80',
     text: 'I found my dream home through RealEstate Hub! The search features made it easy to filter exactly what I was looking for, and the virtual tour saved me so much time. Highly recommend!'
   },
   {
     id: '2',
-    name: 'Robert Chen',
+    name: 'Ali Ahmed',
     role: 'Property Investor',
-    image: 'https://randomuser.me/api/portraits/men/52.jpg',
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80',
     text: 'As an investor, I appreciate the detailed property information and analytics available on RealEstate Hub. It helps me make informed decisions quickly. The chat feature also makes it easy to connect with sellers.'
   },
   {
     id: '3',
-    name: 'Maria Rodriguez',
+    name: 'Fatima Malik',
     role: 'First-time Buyer',
-    image: 'https://randomuser.me/api/portraits/women/45.jpg',
+    image: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80',
     text: 'Being a first-time buyer was intimidating, but RealEstate Hub made the process so much easier. The interface is user-friendly, and I loved getting notifications when new properties matching my criteria were listed.'
+  },
+  {
+    id: '4',
+    name: 'Usman Riaz',
+    role: 'Commercial Client',
+    image: 'https://images.unsplash.com/photo-1543610892-0b1f7e6d8ac1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80',
+    text: 'Found the perfect office space for my startup within days of searching. The location-based filters were incredibly helpful!'
+  },
+  {
+    id: '5',
+    name: 'Sana Javed',
+    role: 'Rental Client',
+    image: 'https://images.unsplash.com/photo-1554151228-14d9def656e4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80',
+    text: 'The rental process was seamless. I could compare multiple properties side by side and schedule viewings directly through the app.'
   }
 ];
 

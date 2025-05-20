@@ -61,8 +61,8 @@ const FeaturedProperties = () => {
         </div>
 
         <div className="text-center mt-12">
-          <Link 
-            to="/properties" 
+          <Link
+            to="/properties"
             className="btn-primary py-3 px-8"
           >
             View All Properties

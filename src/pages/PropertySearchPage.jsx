@@ -18,11 +18,11 @@ const PropertySearchPage = () => {
   const [viewMode, setViewMode] = useState('grid') // 'grid' or 'list'
   const [sortOption, setSortOption] = useState('newest')
   const [showMobileFilters, setShowMobileFilters] = useState(false)
-  
+
   useEffect(() => {
     // Set page title
     document.title = 'Search Properties | RealEstate Hub'
-    
+
     // Initialize search from URL params
     const initialFilters = {
       location: searchParams.get('location') || '',
@@ -35,22 +35,22 @@ const PropertySearchPage = () => {
       maxArea: searchParams.get('maxArea') || '',
       amenities: searchParams.get('amenities') ? searchParams.get('amenities').split(',') : []
     }
-    
+
     if (!loading) {
       handleSearch(initialFilters)
     }
   }, [loading, searchParams])
-  
+
   const handleSearch = (filters) => {
     const results = searchProperties(filters)
     setSearchResults(results)
   }
-  
+
   const handleSort = (option) => {
     setSortOption(option)
-    
+
     const sortedResults = [...searchResults]
-    
+
     switch (option) {
       case 'newest':
         sortedResults.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
@@ -67,24 +67,24 @@ const PropertySearchPage = () => {
       default:
         break
     }
-    
+
     setSearchResults(sortedResults)
   }
-  
+
   if (loading) {
     return (
-      <div className="min-h-screen pt-24 pb-16 px-4">
+      <div className="min-h-screen  pb-16 px-4">
         <div className="container-custom mx-auto">
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary"></div>
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#1B4168]"></div>
           </div>
         </div>
       </div>
     )
   }
-  
+
   return (
-    <div className="min-h-screen pt-24 pb-16 bg-background-light dark:bg-gray-900">
+    <div className="min-h-screen pt-2 pb-16 bg-background-light dark:bg-gray-900">
       <div className="container-custom mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Find Your Perfect Property</h1>
@@ -92,7 +92,7 @@ const PropertySearchPage = () => {
             Browse our extensive collection of properties and find your dream home.
           </p>
         </div>
-        
+
         {/* Mobile Filters Toggle */}
         <div className="md:hidden mb-4">
           <button
@@ -103,23 +103,23 @@ const PropertySearchPage = () => {
             {showMobileFilters ? 'Hide Filters' : 'Show Filters'}
           </button>
         </div>
-        
+
         {/* Search Filters - Mobile */}
         <div className={`md:hidden ${showMobileFilters ? 'block' : 'hidden'}`}>
           <PropertySearchFilters onSearch={handleSearch} />
         </div>
-        
+
         {/* Search Filters - Desktop */}
         <div className="hidden md:block">
           <PropertySearchFilters onSearch={handleSearch} />
         </div>
-        
+
         {/* Results Header */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6 flex flex-col sm:flex-row justify-between items-center">
           <p className="text-gray-700 dark:text-gray-300 mb-4 sm:mb-0">
             <span className="font-semibold">{searchResults.length}</span> properties found
           </p>
-          
+
           <div className="flex items-center space-x-4">
             {/* Sort Options */}
             <div className="relative">
@@ -137,7 +137,7 @@ const PropertySearchPage = () => {
                 </select>
               </div>
             </div>
-            
+
             {/* View Mode Toggle */}
             <div className="flex items-center space-x-2 border-l border-gray-300 dark:border-gray-700 pl-4">
               <button
@@ -157,11 +157,11 @@ const PropertySearchPage = () => {
             </div>
           </div>
         </div>
-        
+
         {/* Results */}
         {searchResults.length > 0 ? (
-          <div className={viewMode === 'grid' 
-            ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' 
+          <div className={viewMode === 'grid'
+            ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
             : 'space-y-6'
           }>
             {searchResults.map((property, index) => (

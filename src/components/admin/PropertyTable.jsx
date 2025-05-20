@@ -77,8 +77,8 @@ const PropertyTable = () => {
   // Format price based on status
   const formatPrice = (price, status) => {
     return status === 'for-rent'
-      ? `$${price.toLocaleString()}/mo`
-      : `$${price.toLocaleString()}`;
+      ? `${price.toLocaleString()}PKR/mo`
+      : `${price.toLocaleString()}PKR`;
   };
 
   // Handle property deletion

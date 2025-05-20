@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { collection, addDoc, doc, updateDoc, deleteDoc, getDocs } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc, deleteDoc, getDocs, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase'; // Adjust the path as necessary
 
 const PropertyContext = createContext();
@@ -14,33 +14,36 @@ export const PropertyProvider = ({ children }) => {
   const [searchHistory, setSearchHistory] = useState([]);
 
   useEffect(() => {
-    const fetchProperties = async () => {
+    setLoading(true);
+    // Set up real-time listener
+    const propertiesCollection = collection(db, 'Properties');
+    const unsubscribe = onSnapshot(propertiesCollection, (snapshot) => {
       try {
-        // Fetch properties from Firestore
-        const propertiesCollection = collection(db, 'Properties');
-        const propertiesSnapshot = await getDocs(propertiesCollection);
-
-        // Map Firestore documents to an array of property objects
-        const propertiesData = propertiesSnapshot.docs.map(doc => ({
-          id: doc.id, // Include the document ID
-          ...doc.data() // Include all other fields
+        // Map the documents to property objects
+        const propertiesData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
         }));
 
-        // Update state with fetched properties
+        // Update properties state
         setProperties(propertiesData);
 
-        // Filter featured properties
+        // Update featured properties
         const featured = propertiesData.filter(property => property.featured);
         setFeaturedProperties(featured);
 
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching properties:', error);
+        console.error('Error processing properties:', error);
         setLoading(false);
       }
-    };
+    }, (error) => {
+      console.error('Snapshot listener error:', error);
+      setLoading(false);
+    });
 
-    fetchProperties();
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, []);
 
   const getPropertyById = (id) => {

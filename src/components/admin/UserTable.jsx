@@ -20,8 +20,7 @@ const UserTable = ({ users }) => {
   const filteredUsers = users
     .filter(user => {
       // Search filter
-      const matchesSearch = user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesSearch = user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) || user.email.toLowerCase().includes(searchTerm.toLowerCase())
 
       // Role filter
       const matchesRole = roleFilter === 'all' || user.role === roleFilter

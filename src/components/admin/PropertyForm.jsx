@@ -41,6 +41,7 @@ const PropertyForm = ({ setShowForm }) => {
   const [formData, setFormData] = useState(initialState);
   const [errors, setErrors] = useState({});
   const [amenityInput, setAmenityInput] = useState('');
+  const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
 
   // Available amenities for selection
@@ -91,28 +92,64 @@ const PropertyForm = ({ setShowForm }) => {
     }
   };
 
-  const handleAddImage = () => {
-    const placeholderImages = [
-      'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2073&q=80',
-      'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80',
-      'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80',
-      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80',
-      'https://images.unsplash.com/photo-1613490493576-7fde63acd811?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80'
-    ];
+  // const handleAddImage = () => {
+  //   const placeholderImages = [
+  //     'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2073&q=80',
+  //     'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80',
+  //     'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80',
+  //     'https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80',
+  //     'https://images.unsplash.com/photo-1613490493576-7fde63acd811?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80'
+  //   ];
 
-    const randomImage = placeholderImages[Math.floor(Math.random() * placeholderImages.length)];
+  //   const randomImage = placeholderImages[Math.floor(Math.random() * placeholderImages.length)];
 
-    setFormData(prev => ({
-      ...prev,
-      images: [...prev.images, randomImage]
-    }));
-  };
+  //   setFormData(prev => ({
+  //     ...prev,
+  //     images: [...prev.images, randomImage]
+  //   }));
+  // };
 
   const handleRemoveImage = (index) => {
     setFormData(prev => ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index)
     }));
+  };
+
+  const handleAddImage = async (e) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    setUploading(true);
+    const loadingToast = toast.loading('Uploading images...');
+
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const formDataUpload = new FormData();
+        formDataUpload.append('file', files[i]);
+
+        const response = await fetch("https://thebiol.com/wp-json/react-uploader/v1/upload", {
+          method: "POST",
+          body: formDataUpload,
+        });
+
+        if (!response.ok) throw new Error('Upload failed');
+
+        const data = await response.json();
+        setFormData(prev => ({
+          ...prev,
+          images: [...prev.images, data.url]
+        }));
+      }
+      toast.dismiss(loadingToast);
+      toast.success('Images uploaded successfully!');
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.dismiss(loadingToast);
+      toast.error('Failed to upload images');
+    } finally {
+      setUploading(false);
+    }
   };
 
   const validateForm = () => {
@@ -224,7 +261,6 @@ const PropertyForm = ({ setShowForm }) => {
             >
               <option value="apartment">Apartment</option>
               <option value="house">House</option>
-              <option value="condo">Condo</option>
               <option value="commercial">Commercial</option>
               <option value="land">Land</option>
             </select>
@@ -487,14 +523,22 @@ const PropertyForm = ({ setShowForm }) => {
         <h2 className="text-xl font-semibold mb-4">Property Images</h2>
 
         <div className="mb-4">
-          <button
-            type="button"
-            onClick={handleAddImage}
-            className="flex items-center justify-center w-full p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary dark:hover:border-primary-light transition-colors"
+          <label
+            className={`flex items-center justify-center w-full p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary dark:hover:border-primary-light transition-colors cursor-pointer ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleAddImage}
+              disabled={uploading}
+              className="hidden"
+            />
             <AddPhotoAlternateIcon className="mr-2 text-gray-500 dark:text-gray-400" />
-            <span className="text-gray-600 dark:text-gray-400">Add Image</span>
-          </button>
+            <span className="text-gray-600 dark:text-gray-400">
+              {uploading ? 'Uploading...' : 'Upload Images'}
+            </span>
+          </label>
           {errors.images && <p className="mt-1 text-sm text-red-500">{errors.images}</p>}
         </div>
 

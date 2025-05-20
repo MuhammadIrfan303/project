@@ -2,33 +2,36 @@ import { useState, useEffect } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import { useTheme } from './contexts/ThemeContext'
-
 // Layouts
 import MainLayout from './layouts/MainLayout'
-import AdminLayout from './layouts/AdminLayout'
 
 // Pages
 import HomePage from './pages/HomePage'
 import PropertySearchPage from './pages/PropertySearchPage'
 import PropertyDetailsPage from './pages/PropertyDetailsPage'
 import LoginPage from './pages/LoginPage'
-// import RegisterPage from './pages/RegisterPage'
-// import ProfilePage from './pages/ProfilePage'
+import RegisterPage from './pages/RegisterPage'
+import AdminLayout from './layouts/AdminLayout'
 import AdminDashboardPage from './pages/admin/DashboardPage'
 import AdminPropertiesPage from './pages/admin/PropertiesPage'
 import AdminUsersPage from './pages/admin/UsersPage'
-// import AdminAnalyticsPage from './pages/admin/AnalyticsPage'
-// import NotFoundPage from './pages/NotFoundPage'
 
-// Components
-import ProtectedRoute from './components/auth/ProtectedRoute'
+
+import BlogManagement from './pages/admin/BlogManagement'
 import AdminRoute from './components/auth/AdminRoute'
-import ChatWidget from './components/chat/ChatWidget'
-import NotificationCenter from './components/notifications/NotificationCenter'
-import ScrollToTop from './components/common/ScrollToTop'
+import ScrollToTopButton from './components/common/ScrollToTopButton'
+
+import BlogsPage from './pages/blogspage'
+import BlogPost from './pages/blogpost'
+
 import PropertyEditForm from './components/admin/PropertyEditForm'
-import RegisterPage from './pages/RegisterPage'
-import ProfilePage from './pages/ProfilePage'
+import AddAdvisor from './pages/admin/AddAdvisor'
+import AdvisiorManagement from './pages/admin/AdvisiorManagement'
+import PropertyAdvisor from './pages/agents/PropertyAdvisor'
+import AddPropertiesAdvisor from './pages/agents/AddPropertiesAdvisor'
+import AdvisorPage from './pages/agents/AdvisorPage'
+import AdvisorProfile from './pages/agents/AdvisorProfile'
+import ProfilePage from './pages/profilepage'
 
 function App() {
   const location = useLocation()
@@ -54,7 +57,7 @@ function App() {
 
   return (
     <div className={theme === 'dark' ? 'dark' : ''}>
-      <ScrollToTop />
+      <ScrollToTopButton />
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           {/* Public Routes */}
@@ -62,14 +65,16 @@ function App() {
           <Route path='Register' element={<RegisterPage />} />
           <Route path="/" element={<MainLayout />}>
             <Route index element={<HomePage />} />
+            <Route path='/profile' element={<ProfilePage />} />
             <Route path="properties" element={<PropertySearchPage />} />
             <Route path="properties/:id" element={<PropertyDetailsPage />} />
-            <Route path="profile" element={<ProfilePage
-            />} />
-
-            {/* Protected Routes */}
-
-
+            <Route path='/advisor' element={<AdvisorPage />} />
+            <Route path='/advisor/:id' element={<AdvisorProfile />} />
+            <Route path="/blogs" element={<BlogsPage />} />
+            <Route path="/blog/:id" element={<BlogPost />} />
+            <Route path='/advisor/Dashbord' element={<PropertyAdvisor />} />
+            <Route path='advisor/add-property' element={<AddPropertiesAdvisor />} />
+            <Route path='/propertyEdit/:id' element={<PropertyEditForm />} />
             {/* Admin Routes */}
             <Route path="admin" element={
               <AdminRoute>
@@ -79,21 +84,18 @@ function App() {
               <Route index element={<AdminDashboardPage />} />
               <Route path="properties" element={<AdminPropertiesPage />} />
               <Route path="users" element={<AdminUsersPage />} />
-              <Route path="propertyEdit/:id" element={<PropertyEditForm />} />
-              {/* <Route path="analytics" element={<AdminAnalyticsPage />} /> */}
-            </Route>
+              <Route path="add-advisior" element={<AddAdvisor />} />
+              <Route path="advisiors" element={<AdvisiorManagement />} />
 
-            {/* 404 Route */}
-            {/* <Route path="*" element={<NotFoundPage />} /> */}
+
+              <Route path="blogs" element={<BlogManagement />} />
+            </Route>
           </Route>
         </Routes>
       </AnimatePresence>
-
-      {/* Global Components */}
-      <ChatWidget />
-      <NotificationCenter />
     </div>
-  )
+  );
 }
 
 export default App
+
